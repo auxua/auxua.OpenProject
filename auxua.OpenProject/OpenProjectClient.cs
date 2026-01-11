@@ -18,6 +18,7 @@ namespace auxua.OpenProject
         private readonly IAuthProvider? _auth;
 
         public ProjectsApi Projects { get; }
+        public WorkPackagesApi WorkPackages { get; }
 
         public OpenProjectClient(BaseConfig options)
         {
@@ -26,8 +27,8 @@ namespace auxua.OpenProject
                 AllowAutoRedirect = false
             };
 
-            _http = new HttpClient(handler)
-            //_http = new HttpClient
+            _http = new HttpClient(handler);
+            _http = new HttpClient
             {
                 BaseAddress = new Uri(options.BaseUrl),
                 Timeout = options.Timeout,
@@ -48,6 +49,7 @@ namespace auxua.OpenProject
            
 
             Projects = new ProjectsApi(_http, _auth);
+            WorkPackages = new WorkPackagesApi(_http, _auth);
         }
     }
 }

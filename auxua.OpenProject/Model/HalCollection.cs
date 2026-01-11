@@ -13,6 +13,15 @@ namespace auxua.OpenProject.Model
         [JsonProperty("count")]
         public int Count { get; set; }
 
+        [JsonProperty("pageSize")]
+        public int PageSize { get; set; }
+
+        [JsonProperty("offset")]
+        public int Offset { get; set; }
+
+
+
+
         [JsonProperty("_embedded")]
         public HalCollectionEmbedded<T>? Embedded { get; set; }
 
