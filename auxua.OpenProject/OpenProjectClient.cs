@@ -19,6 +19,7 @@ namespace auxua.OpenProject
 
         public ProjectsApi Projects { get; }
         public WorkPackagesApi WorkPackages { get; }
+        public CustomFieldRegistry CustomFields { get; } = new CustomFieldRegistry();
 
         public OpenProjectClient(BaseConfig options)
         {
@@ -49,7 +50,7 @@ namespace auxua.OpenProject
            
 
             Projects = new ProjectsApi(_http, _auth);
-            WorkPackages = new WorkPackagesApi(_http, _auth);
+            WorkPackages = new WorkPackagesApi(_http, _auth, CustomFields);
         }
     }
 }

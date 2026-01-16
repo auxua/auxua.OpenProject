@@ -1,6 +1,8 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace auxua.OpenProject.Model
@@ -13,7 +15,6 @@ namespace auxua.OpenProject.Model
         [JsonProperty("subject")]
         public string? Subject { get; set; }
 
-        // "description" ist ein Objekt (raw/html), nicht nur string
         [JsonProperty("description")]
         public WorkPackageDescription? Description { get; set; }
 
@@ -21,16 +22,19 @@ namespace auxua.OpenProject.Model
         public int? LockVersion { get; set; }
 
         [JsonProperty("startDate")]
-        public string? StartDate { get; set; } // später DateOnly/DateTime
+        public string? StartDate { get; set; } //TODO: Cast to DateTime?
 
         [JsonProperty("dueDate")]
-        public string? DueDate { get; set; }
+        public string? DueDate { get; set; }//TODO: Cast to DateTime?
 
         [JsonProperty("createdAt")]
-        public string? CreatedAt { get; set; }
+        public string? CreatedAt { get; set; }//TODO: Cast to DateTime?
 
         [JsonProperty("updatedAt")]
-        public string? UpdatedAt { get; set; }
+        public string? UpdatedAt { get; set; }//TODO: Cast to DateTime?
+
+        [JsonExtensionData]
+        public IDictionary<string, JToken>? Extra { get; set; }
     }
 
     public sealed class WorkPackageDescription
@@ -41,4 +45,6 @@ namespace auxua.OpenProject.Model
         [JsonProperty("html")]
         public string? Html { get; set; }
     }
+
+
 }

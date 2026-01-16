@@ -25,7 +25,6 @@ namespace auxua.OpenProject.Model
         [JsonProperty("_embedded")]
         public HalCollectionEmbedded<T>? Embedded { get; set; }
 
-        // Komfort-Property: direkt typisierte Elemente
         [JsonIgnore]
         public IReadOnlyList<T> Elements => Embedded?.Elements ?? new List<T>();
     }

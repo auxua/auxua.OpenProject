@@ -1,10 +1,8 @@
 ﻿using auxua.OpenProject.Authentication;
 using auxua.OpenProject.Model;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 
@@ -14,21 +12,30 @@ namespace auxua.OpenProject.Client
     {
         private readonly HttpClient _http;
         private readonly IAuthProvider? _auth;
+        private readonly CustomFieldRegistry _customFieldRegistry;
 
-        public WorkPackagesApi(HttpClient http, IAuthProvider? auth)
+        public WorkPackagesApi(HttpClient http, IAuthProvider? auth, CustomFieldRegistry customFieldRegistry)
         {
             _http = http;
             _auth = auth;
+            _customFieldRegistry = customFieldRegistry;
         }
 
-        public async Task<HalCollection<WorkPackage>> GetWorkPackagesAsync(int pageSize = 20, int offset = 1)
+        /// <summary>
+        /// Central method: fetches a page of work packages, optionally filtered.
+        /// Also imports embedded schema custom field definitions into the instance registry.
+        /// </summary>
+        public async Task<HalCollection<WorkPackage>> GetWorkPackagesAsync(
+            WorkPackageQuery? query = null,
+            int pageSize = 20,
+            int page = 1)
         {
-            // offset = page number (wie bei dir erprobt)
-            using var req = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"api/v3/work_packages?pageSize={pageSize}&offset={offset}"
-            );
+            var url = $"api/v3/work_packages?pageSize={pageSize}&offset={page}";
 
+            if (query != null)
+                url += $"&filters={query.Build()}";
+
+            using var req = new HttpRequestMessage(HttpMethod.Get, url);
             _auth?.Apply(req);
 
             var resp = await _http.SendAsync(req);
@@ -36,6 +43,17 @@ namespace auxua.OpenProject.Client
 
             if (!resp.IsSuccessStatusCode)
                 throw new ApiException(resp.StatusCode, body);
+
+            // Best-effort: schemas may be embedded in collection responses
+            // We do NOT fail the request if schema import fails.
+            try
+            {
+                _customFieldRegistry.ImportFromWorkPackagesCollectionJson(body);
+            }
+            catch
+            {
+                // optional: log later
+            }
 
             return JsonConvert.DeserializeObject<HalCollection<WorkPackage>>(body)
                    ?? new HalCollection<WorkPackage>();
@@ -57,15 +75,26 @@ namespace auxua.OpenProject.Client
         }
 
         public Task<List<WorkPackage>> GetAllWorkPackagesAsync(int pageSize = 100)
+            => GetAllWorkPackagesAsync(query: null, pageSize: pageSize);
+
+        public Task<List<WorkPackage>> GetAllWorkPackagesAsync(WorkPackageQuery? query, int pageSize = 100)
         {
             return PaginationHelper.FetchAllAsync<WorkPackage>(
-                (page, ps) => GetWorkPackagesAsync(ps, page),
+                (page, ps) => GetWorkPackagesAsync(query, ps, page),
                 pageSize: pageSize,
                 startPage: 1
             );
         }
 
+        public Task<List<WorkPackage>> GetAllWorkPackagesForProjectAsync(int projectId, int pageSize = 100)
+        {
+            var q = WorkPackageQuery.ForProject(projectId);
+            return GetAllWorkPackagesAsync(q, pageSize);
+        }
 
+        // ----------------------------
+        // Query builder
+        // ----------------------------
         public sealed class WorkPackageQuery
         {
             private readonly List<object> _filters = new();
@@ -102,52 +131,6 @@ namespace auxua.OpenProject.Client
                 var json = JsonConvert.SerializeObject(_filters);
                 return HttpUtility.UrlEncode(json);
             }
-        }
-
-
-        public async Task<HalCollection<WorkPackage>> GetWorkPackagesAsync(
-                WorkPackageQuery query,
-                int pageSize = 20,
-                int page = 1)
-        {
-            var filterPart = query != null
-                ? $"&filters={query.Build()}"
-                : "";
-
-            using var req = new HttpRequestMessage(
-                HttpMethod.Get,
-                $"api/v3/work_packages?pageSize={pageSize}&offset={page}{filterPart}"
-            );
-
-            _auth?.Apply(req);
-
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
-
-            return JsonConvert.DeserializeObject<HalCollection<WorkPackage>>(body)
-                   ?? new HalCollection<WorkPackage>();
-        }
-
-        public Task<List<WorkPackage>> GetAllWorkPackagesAsync(
-            WorkPackageQuery? query,
-            int pageSize = 100)
-        {
-            return PaginationHelper.FetchAllAsync<WorkPackage>(
-                (page, ps) => GetWorkPackagesAsync(query, ps, page),
-                pageSize: pageSize,
-                startPage: 1
-            );
-        }
-
-        public Task<List<WorkPackage>> GetAllWorkPackagesForProjectAsync(
-            int projectId,
-            int pageSize = 100)
-        {
-            var q = WorkPackageQuery.ForProject(projectId);
-            return GetAllWorkPackagesAsync(q, pageSize);
         }
     }
 }

@@ -45,6 +45,23 @@ namespace OpenProjectClient
             var wp = await client.WorkPackages.GetWorkPackagesAsync(query);
             var wp2 = await client.WorkPackages.GetAllWorkPackagesAsync(query);
 
+            var koop = wp2.Where(x => x.Subject.Contains("KOOP (NaIon)")).First();
+
+
+            List<string> cfields = new List<string>();
+            foreach (var item in wp2)
+            {
+                var fields = item.Links.Where(x => x.Key.StartsWith("customField"));
+                foreach (var c in fields)
+                    cfields.Add(c.Key);
+            }
+
+            var fkoop = new WorkPackageFacade(koop, client.CustomFields);
+
+            Console.WriteLine(fkoop.GetCustomFields().Dump());
+
+            //Console.WriteLine(koop.Dump());
+
             Console.WriteLine("fin.");
             Console.ReadLine();
                 

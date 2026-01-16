@@ -1,0 +1,113 @@
+﻿using auxua.OpenProject.Client;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Cryptography.X509Certificates;
+using System.Text.RegularExpressions;
+
+namespace auxua.OpenProject.Model
+{
+    public sealed class WorkPackageFacade
+    {
+        private static readonly Regex CfKey =
+            new(@"^customFields?(?<id>\d+)$", RegexOptions.Compiled);
+
+        private readonly WorkPackage _wp;
+        private readonly CustomFieldRegistry _registry;
+
+        public int Id => _wp.Id;
+        public string Subject => _wp.Subject;
+        public WorkPackageDescription? Description => _wp.Description;
+        public string? Type => _wp.Type;
+        
+        public string? Status { get; private set; }
+        public string? OpType { get; private set; }
+
+        public string? Parent { get; private set; }
+
+        
+
+
+        public WorkPackageFacade(WorkPackage wp, CustomFieldRegistry registry)
+        {
+            _wp = wp;
+            _registry = registry;
+
+            ExtractValues();
+        }
+
+        private void ExtractValues()
+        {
+            var l = this._wp.Links.Where(x => x.Key.StartsWith("type")).First();
+            OpType = l.Value["title"].ToString();
+
+            l = this._wp.Links.Where(x => x.Key.StartsWith("status")).First();
+            Status = l.Value["title"].ToString();
+
+            l = this._wp.Links.Where(x => x.Key.StartsWith("parent")).First();
+            Parent = l.Value["title"].ToString();
+
+            // TODO: Further Fields as needed
+        }
+
+        public Dictionary<int, CustomFieldValue> GetCustomFields()
+        {
+            var result = new Dictionary<int, CustomFieldValue>();
+
+            // A) Scalar / direct values from Extra: customField12, customFields8, etc.
+            if (_wp.Extra != null)
+            {
+                foreach (var kv in _wp.Extra)
+                {
+                    var m = CfKey.Match(kv.Key);
+                    if (!m.Success) continue;
+                    if (!int.TryParse(m.Groups["id"].Value, out var id)) continue;
+
+                    if (!result.TryGetValue(id, out var cf))
+                    {
+                        cf = new CustomFieldValue { Id = id };
+                        result[id] = cf;
+                    }
+
+                    cf.Value = kv.Value;
+                }
+            }
+
+            // B) List/Reference values from _links: _links.customField8 or _links.customFields8
+            // We iterate all link rels and pick those matching customField(s){ID}
+            if (_wp.Links != null)
+            {
+                foreach (var rel in _wp.Links.Keys)
+                {
+                    var m = CfKey.Match(rel);
+                    if (!m.Success) continue;
+                    if (!int.TryParse(m.Groups["id"].Value, out var id)) continue;
+
+                    var links = _wp.GetLinks(rel); // should return IEnumerable<HalLink>
+                    if (links == null) continue;
+
+                    if (!result.TryGetValue(id, out var cf))
+                    {
+                        cf = new CustomFieldValue { Id = id };
+                        result[id] = cf;
+                    }
+
+                    cf.Links.AddRange(links);
+                }
+            }
+
+            // C) Add display names from registry (instanzweit)
+            foreach (var kv in result)
+            {
+                if (_registry.TryGet(kv.Key, out var def))
+                {
+                    kv.Value.Name = def.Name;
+                }
+            }
+
+            return result;
+        }
+    }
+
+
+}
