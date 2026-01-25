@@ -1,8 +1,6 @@
 ﻿using auxua.OpenProject.Client;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text.RegularExpressions;
 
 namespace auxua.OpenProject.Model
@@ -19,14 +17,13 @@ namespace auxua.OpenProject.Model
         public string Subject => _wp.Subject;
         public WorkPackageDescription? Description => _wp.Description;
         public string? Type => _wp.Type;
-        
+
         public string? Status { get; private set; }
         public string? OpType { get; private set; }
 
         public string? Parent { get; private set; }
 
-        
-
+        public Dictionary<string, CustomFieldTyped> CustomFields { get; private set; } = new Dictionary<string, CustomFieldTyped>();
 
         public WorkPackageFacade(WorkPackage wp, CustomFieldRegistry registry)
         {
@@ -48,6 +45,13 @@ namespace auxua.OpenProject.Model
             Parent = l.Value["title"].ToString();
 
             // TODO: Further Fields as needed
+            var cf = GetCustomFields();
+            foreach (var item in cf)
+            {
+                int i = 0;
+                if (item.Value.Name == null) continue;
+                this.CustomFields.Add(item.Value.Name, new CustomFieldTyped(item.Value));
+            }
         }
 
         public Dictionary<int, CustomFieldValue> GetCustomFields()
@@ -108,6 +112,4 @@ namespace auxua.OpenProject.Model
             return result;
         }
     }
-
-
 }

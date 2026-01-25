@@ -33,21 +33,16 @@ namespace auxua.OpenProject
             {
                 BaseAddress = new Uri(options.BaseUrl),
                 Timeout = options.Timeout,
-                
             };
 
             _http.DefaultRequestHeaders.Accept.Clear();
             _http.DefaultRequestHeaders.Accept.ParseAdd("application/hal+json");
             _http.DefaultRequestHeaders.Accept.ParseAdd("application/json");
             _http.DefaultRequestHeaders.UserAgent.ParseAdd(options.UserAgent);
-            
 
             _auth = string.IsNullOrWhiteSpace(options.PersonalAccessToken)
                 ? null
                 : new PatAuthProvider(options.PersonalAccessToken);
-
-            
-           
 
             Projects = new ProjectsApi(_http, _auth);
             WorkPackages = new WorkPackagesApi(_http, _auth, CustomFields);

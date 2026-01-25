@@ -55,8 +55,14 @@ namespace auxua.OpenProject.Client
                 // optional: log later
             }
 
-            return JsonConvert.DeserializeObject<HalCollection<WorkPackage>>(body)
+            var res = JsonConvert.DeserializeObject<HalCollection<WorkPackage>>(body)
                    ?? new HalCollection<WorkPackage>();
+
+            foreach (var item in res.Elements)
+            {
+                item.AddCustomFields(_customFieldRegistry);
+            }
+            return res;
         }
 
         public async Task<WorkPackage> GetWorkPackageByIdAsync(int id)

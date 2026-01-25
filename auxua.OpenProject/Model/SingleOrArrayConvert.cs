@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace auxua.OpenProject.Model
+﻿namespace auxua.OpenProject.Model
 {
-    using System;
-    using System.Collections.Generic;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using System;
+    using System.Collections.Generic;
 
     public sealed class SingleOrArrayConverter<T> : JsonConverter
     {

@@ -1,14 +1,14 @@
-﻿using Newtonsoft.Json;
+﻿using auxua.OpenProject.Client;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace auxua.OpenProject.Model
 {
     public sealed class WorkPackage : HalResource
     {
+        private CustomFieldRegistry _customFieldRegistry = null!;
+
         [JsonProperty("id")]
         public int Id { get; set; }
 
@@ -35,6 +35,26 @@ namespace auxua.OpenProject.Model
 
         [JsonExtensionData]
         public IDictionary<string, JToken>? Extra { get; set; }
+
+        public Dictionary<string, CustomFieldTyped> AdditionalFields { get; private set; }
+
+        private WorkPackageFacade _wf = null!;
+
+        public void AddCustomFields(CustomFieldRegistry reg)
+        {
+            this._customFieldRegistry = reg;
+            this._wf = new WorkPackageFacade(this, reg);
+
+            // Add Custom Field
+            AdditionalFields = _wf.CustomFields;
+
+            // Get the "standard" fields too
+            foreach (var item in this.Extra)
+            {
+                if (item.Key.StartsWith("customField")) continue;
+                AdditionalFields[item.Key] = new CustomFieldTyped(new CustomFieldValue() { });
+            }
+        }
     }
 
     public sealed class WorkPackageDescription
@@ -45,6 +65,4 @@ namespace auxua.OpenProject.Model
         [JsonProperty("html")]
         public string? Html { get; set; }
     }
-
-
 }

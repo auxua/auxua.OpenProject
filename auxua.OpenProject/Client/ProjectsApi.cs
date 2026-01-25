@@ -1,10 +1,8 @@
 ﻿using auxua.OpenProject.Authentication;
 using auxua.OpenProject.Model;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace auxua.OpenProject.Client
@@ -20,9 +18,9 @@ namespace auxua.OpenProject.Client
             _auth = auth;
         }
 
-        public async Task<HalCollection<Project>> GetProjectsAsync(int pageSize=10, int offset=0)
+        public async Task<HalCollection<Project>> GetProjectsAsync(int pageSize = 10, int offset = 0)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/projects?pageSize="+pageSize+"&offset="+offset);
+            using var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/projects?pageSize=" + pageSize + "&offset=" + offset);
             _auth?.Apply(req);
 
             var resp = await _http.SendAsync(req);
@@ -66,7 +64,6 @@ namespace auxua.OpenProject.Client
             }
 
             return allProjects.Elements;
-
         }*/
     }
 }

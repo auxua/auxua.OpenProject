@@ -19,9 +19,6 @@ namespace auxua.OpenProject.Model
         [JsonProperty("offset")]
         public int Offset { get; set; }
 
-
-
-
         [JsonProperty("_embedded")]
         public HalCollectionEmbedded<T>? Embedded { get; set; }
 

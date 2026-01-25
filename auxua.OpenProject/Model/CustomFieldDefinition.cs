@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace auxua.OpenProject.Model
@@ -74,7 +73,7 @@ namespace auxua.OpenProject.Model
                     continue;
                 }
 
-                // - Array + Array => concat 
+                // - Array + Array => concat
                 // - Array + scalar => append scalar
                 // - scalar + Array => prepend scalar
                 // - scalar + scalar => keep existing
@@ -114,6 +113,62 @@ namespace auxua.OpenProject.Model
         }
     }
 
+    public class CustomFieldTyped
+    {
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public object? Value { get; set; }
+
+        public CustomFieldTyped(CustomFieldValue val)
+        {
+            this.Id = val.Id;
+            this.Name = val.Name;
+
+            // Case: Scalar value
+            if (val.Value != null)
+            {
+                switch (val.Value.Type)
+                {
+                    case JTokenType.Integer:
+                        this.Value = val.Value.ToObject<int>();
+                        break;
+
+                    case JTokenType.Float:
+                        this.Value = val.Value.ToObject<double>();
+                        break;
+
+                    case JTokenType.Boolean:
+                        this.Value = val.Value.ToObject<bool>();
+                        break;
+
+                    case JTokenType.String:
+                        this.Value = val.Value.ToObject<string>();
+                        break;
+
+                    case JTokenType.Date:
+                        this.Value = val.Value.ToObject<DateTime>();
+                        break;
+
+                    default:
+                        this.Value = val.Value.ToString();
+                        break;
+                }
+                return;
+            }
+
+            // Case: List or special
+            var values = new List<string>();
+            foreach (var link in val.Links)
+            {
+                if (!string.IsNullOrWhiteSpace(link.Title))
+                    values.Add(link.Title!);
+                else if (!string.IsNullOrWhiteSpace(link.Href))
+                    values.Add(link.Href!);
+            }
+            this.Value = values;
+        }
+    }
+
     public sealed class CustomFieldValue
     {
         public int Id { get; set; }
@@ -122,6 +177,19 @@ namespace auxua.OpenProject.Model
         public JToken? Value { get; set; }
 
         public List<HalLink> Links { get; set; } = new List<HalLink>();
+
+        public CustomFieldValue()
+        {
+            
+        }
+
+        public CustomFieldValue(int id, string? name, JToken? value, List<HalLink> links)
+        {
+            Id = id;
+            Name = name;
+            Value = value;
+            Links = links;
+        }
 
         public static List<string> GetLinkTitles(CustomFieldValue cf)
         {

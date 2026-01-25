@@ -1,8 +1,6 @@
 ﻿using auxua.OpenProject.Model;
 using Newtonsoft.Json.Linq;
-using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Text.RegularExpressions;
 
 namespace auxua.OpenProject.Client
