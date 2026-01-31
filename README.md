@@ -3,7 +3,7 @@
 [![Version](https://img.shields.io/github/v/tag/auxua/OpenProjectClient?sort=semver)](https://github.com/auxua/OpenProjectClient/tags)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 ![.NET](https://img.shields.io/badge/.NET-Standard2.0-purple?logo=dotnet)
-[![NuGet](https://img.shields.io/nuget/v/auxua.OpenProjectClient?color=blue&logo=nuget)](https://www.nuget.org/packages/auxua.OpenProjectClient/)]
+[![NuGet](https://img.shields.io/nuget/v/auxua.OpenProjectClient?color=blue&logo=nuget)](https://www.nuget.org/packages/auxua.OpenProject/)]
 
 ## OpenProject Client
 
