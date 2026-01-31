@@ -16,7 +16,7 @@ namespace auxua.OpenProject.Model
         public string? Subject { get; set; }
 
         [JsonProperty("description")]
-        public WorkPackageDescription? Description { get; set; }
+        public Formattable? Description { get; set; }
 
         [JsonProperty("lockVersion")]
         public int? LockVersion { get; set; }
@@ -57,12 +57,12 @@ namespace auxua.OpenProject.Model
         }
     }
 
-    public sealed class WorkPackageDescription
-    {
-        [JsonProperty("raw")]
-        public string? Raw { get; set; }
+    //public sealed class WorkPackageDescription
+    //{
+    //    [JsonProperty("raw")]
+    //    public string? Raw { get; set; }
 
-        [JsonProperty("html")]
-        public string? Html { get; set; }
-    }
+    //    [JsonProperty("html")]
+    //    public string? Html { get; set; }
+    //}
 }

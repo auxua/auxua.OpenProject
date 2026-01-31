@@ -4,7 +4,20 @@
     <TargetFramework>netstandard2.0</TargetFramework>
 	  <!-- Use the latest C# language features -->
 	  <LangVersion>latest</LangVersion>
+	  <Title>auxua.OpenProject</Title>
+	  <Company>auxua</Company>
+	  <Authors>Arno Schmetz</Authors>
+	  <PackageProjectUrl>https://github.com/auxua/OpenProjectClient</PackageProjectUrl>
+	  <PackageReadmeFile>README.md</PackageReadmeFile>
+	  <Version>3.0.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

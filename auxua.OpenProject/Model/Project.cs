@@ -11,14 +11,14 @@ namespace auxua.OpenProject.Model
         [JsonProperty("public")] public bool? Public { get; set; }
         [JsonProperty("createdAt")] public DateTime? CreatedAt { get; set; }
         [JsonProperty("updatedAt")] public DateTime? UpdatedAt { get; set; }
-        [JsonProperty("description")] public TextDescription? Description { get; set; }
-        [JsonProperty("statusExplanation")] public TextDescription? StatusExplanation { get; set; }
+        [JsonProperty("description")] public Formattable? Description { get; set; }
+        [JsonProperty("statusExplanation")] public Formattable? StatusExplanation { get; set; }
     }
 
-    public class TextDescription
-    {
-        [JsonProperty("format")] public string? Format { get; set; }
-        [JsonProperty("raw")] public string? Raw { get; set; }
-        [JsonProperty("html")] public string? Html { get; set; }
-    }
+    //public class TextDescription
+    //{
+    //    [JsonProperty("format")] public string? Format { get; set; }
+    //    [JsonProperty("raw")] public string? Raw { get; set; }
+    //    [JsonProperty("html")] public string? Html { get; set; }
+    //}
 }

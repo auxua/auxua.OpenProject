@@ -1,4 +1,5 @@
 ﻿using auxua.OpenProject.Client;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -13,9 +14,11 @@ namespace auxua.OpenProject.Model
         private readonly WorkPackage _wp;
         private readonly CustomFieldRegistry _registry;
 
+        public Dictionary<string, object> FlattenedFields { get; private set; } = new Dictionary<string, object>();
+
         public int Id => _wp.Id;
         public string Subject => _wp.Subject;
-        public WorkPackageDescription? Description => _wp.Description;
+        public Formattable? Description => _wp.Description;
         public string? Type => _wp.Type;
 
         public string? Status { get; private set; }
@@ -31,6 +34,69 @@ namespace auxua.OpenProject.Model
             _registry = registry;
 
             ExtractValues();
+
+            Flatten();
+
+            GetRelations();
+        }
+
+        private void GetRelations()
+        {
+            
+        }
+
+        /// <summary>
+        /// Flattens all fields (main fields, Extra, custom fields) into a single dictionary for easy access.
+        /// </summary>
+        private void Flatten()
+        {
+            // First, the Main Fields
+            this.FlattenedFields["Status"] = this.Status;
+            this.FlattenedFields["OpType"] = this.OpType;
+            this.FlattenedFields["Type"] = this.Type;
+            this.FlattenedFields["Parent"] = this.Parent;
+            this.FlattenedFields["Subject"] = this.Subject;
+            this.FlattenedFields["Description"] = this.Description != null ? this.Description.Raw : null;
+
+            // Then, the Extra Fields
+            foreach (var item in _wp.Extra)
+            {
+                if (item.Key.StartsWith("customField")) continue; // Skip custom fields here
+                if (this.FlattenedFields.ContainsKey(item.Key))
+                {
+                    Console.WriteLine($"[WorkPackageFacade] Warning: Field '{item.Key}' from Extra conflicts with main field. Skipping.");
+                    continue; // Skip if already exists (main fields take precedence)
+                }
+                if (item.Value is Newtonsoft.Json.Linq.JValue value)
+                {
+                    this.FlattenedFields[item.Key] = value.Value;
+                }
+                else if (item.Value is Newtonsoft.Json.Linq.JObject obj)
+                {
+                    this.FlattenedFields[item.Key] = obj;
+                }
+                //var jval = value;
+                //this.FlattenedFields[item.Key] = jval.Value;
+            }
+
+            // Custon Fields
+            foreach (var kv in this.CustomFields)
+            {
+                if (this.FlattenedFields.ContainsKey(kv.Key))
+                {
+                    Console.WriteLine($"[WorkPackageFacade] Warning: Custom Field '{kv.Key}' conflicts with existing field. Skipping.");
+                    continue; // Skip if already exists
+                }
+                this.FlattenedFields[kv.Key] = kv.Value.Value;
+            }
+
+            // Additionals
+            this.FlattenedFields["Id"] = this.Id;
+            this.FlattenedFields["CreatedAt"] = this._wp.CreatedAt;
+            this.FlattenedFields["UpdatedAt"] = this._wp.UpdatedAt;
+            this.FlattenedFields["DueDate"] = this._wp.DueDate;
+            this.FlattenedFields["LockVersion"] = this._wp.LockVersion;
+
         }
 
         private void ExtractValues()

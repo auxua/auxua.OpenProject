@@ -8,6 +8,7 @@ namespace auxua.OpenProject
 {
     public class OpenProjectClient
     {
+
         internal static readonly string Version = Assembly
                                                     .GetExecutingAssembly()
                                                     .GetName()
@@ -20,6 +21,11 @@ namespace auxua.OpenProject
         public ProjectsApi Projects { get; }
         public WorkPackagesApi WorkPackages { get; }
         public CustomFieldRegistry CustomFields { get; } = new CustomFieldRegistry();
+        public ActivitiesApi Activities { get; } 
+        public RelationsApi Relations { get; }
+        public NewsApi News { get; }
+        public UsersApi Users { get; }
+        public TimeEntriesApi TimeEntries { get; }
 
         public OpenProjectClient(BaseConfig options)
         {
@@ -28,11 +34,11 @@ namespace auxua.OpenProject
                 AllowAutoRedirect = false
             };
 
-            _http = new HttpClient(handler);
-            _http = new HttpClient
+            _http = new HttpClient(handler)
             {
                 BaseAddress = new Uri(options.BaseUrl),
                 Timeout = options.Timeout,
+
             };
 
             _http.DefaultRequestHeaders.Accept.Clear();
@@ -46,6 +52,11 @@ namespace auxua.OpenProject
 
             Projects = new ProjectsApi(_http, _auth);
             WorkPackages = new WorkPackagesApi(_http, _auth, CustomFields);
+            Activities = new ActivitiesApi(_http, _auth);
+            Relations = new RelationsApi(_http, _auth);
+            News = new NewsApi(_http, _auth);
+            Users = new UsersApi(_http, _auth);
+            TimeEntries =  new TimeEntriesApi(_http, _auth);
         }
     }
 }

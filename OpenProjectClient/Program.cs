@@ -43,7 +43,7 @@ namespace OpenProjectClient
             var wp = await client.WorkPackages.GetWorkPackagesAsync(query);
             var wp2 = await client.WorkPackages.GetAllWorkPackagesAsync(query);
 
-            //var koop = wp2.Where(x => x.Subject.Contains("KOOP (NaIon)")).First();
+            //var koop = wp2.Where(x => x.Subject.Contains("KOOP")).First();
 
             //List<string> cfields = new List<string>();
             //foreach (var item in wp2)
@@ -60,8 +60,13 @@ namespace OpenProjectClient
 
             var testwp = wp2.Where(x => x.Subject == "Test Work Package").First();
             var ftest = new WorkPackageFacade(testwp, client.CustomFields);
-            var cftest = ftest.GetCustomFields();
-            Console.WriteLine(ftest.CustomFields.Dump());
+
+            var act = await client.Activities.GetActivitiesForWorkPackageAsync(testwp);
+            var rel = await client.Relations.GetRelationsForWorkPackageAsync(testwp);
+            var news = await client.News.GetAllNewsAsync();
+            //var aact = await client.Activities.
+            //var cftest = ftest.GetCustomFields();
+            //Console.WriteLine(ftest.CustomFields.Dump());
 
             //Console.WriteLine(koop.Dump());
 

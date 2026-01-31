@@ -1,4 +1,10 @@
 <Solution>
+  <Folder Name="/Projektmappenelemente/">
+    <File Path=".gitattributes" />
+    <File Path=".gitignore" />
+    <File Path="LICENSE.txt" />
+    <File Path="README.md" />
+  </Folder>
   <Project Path="auxua.OpenProject/auxua.OpenProject.csproj" />
   <Project Path="OpenProjectClient/OpenProjectClient.csproj" />
 </Solution>
