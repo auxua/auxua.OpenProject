@@ -7,17 +7,33 @@ using System.Threading.Tasks;
 
 namespace auxua.OpenProject.Client
 {
+    /// <summary>
+    /// Client for interacting with OpenProject projects
+    /// Provides methods to list projects and fetch all projects using pagination helpers
+    /// </summary>
     public class ProjectsApi
     {
         private readonly HttpClient _http;
         private readonly IAuthProvider? _auth;
 
+        /// <summary>
+        /// Create a new <see cref="ProjectsApi"/> instance
+        /// </summary>
+        /// <param name="http">The <see cref="HttpClient"/> used to send requests to the OpenProject API.</param>
+        /// <param name="auth">Optional authentication provider that will apply authentication headers to requests.</param>
         public ProjectsApi(HttpClient http, IAuthProvider? auth)
         {
             _http = http;
             _auth = auth;
         }
 
+        /// <summary>
+        /// Retrieve a page of projects from the OpenProject API
+        /// </summary>
+        /// <param name="pageSize">The number of projects per page. Defaults to 10.</param>
+        /// <param name="offset">The page offset to retrieve. Defaults to 0.</param>
+        /// <returns>A task that resolves to a <see cref="HalCollection{Project}"/> containing the projects for the requested page.</returns>
+        /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Project>> GetProjectsAsync(int pageSize = 10, int offset = 0)
         {
             using var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/projects?pageSize=" + pageSize + "&offset=" + offset);
@@ -33,6 +49,11 @@ namespace auxua.OpenProject.Client
                    ?? new HalCollection<Project>();
         }
 
+        /// <summary>
+        /// Fetch all projects by iterating the paginated endpoint using the pagination helper
+        /// </summary>
+        /// <param name="pageSize">Number of projects to request per page when fetching. Defaults to 10.</param>
+        /// <returns>A task that resolves to a list containing all projects.</returns>
         public Task<List<Project>> GetAllProjectsAsync(int pageSize = 10)
         {
             return PaginationHelper.FetchAllAsync<Project>(

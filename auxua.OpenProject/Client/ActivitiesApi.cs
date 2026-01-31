@@ -11,12 +11,21 @@ using System.Threading.Tasks;
 
 namespace auxua.OpenProject.Client
 {
+    /// <summary>
+    /// Client for working with OpenProject activities.
+    /// Provides methods to retrieve single activities and collections of activities related to work packages.
+    /// </summary>
     public sealed class ActivitiesApi
     {
         private readonly HttpClient _http;
         private readonly IAuthProvider? _auth;
         //private readonly OpenProjectClient _client;
 
+        /// <summary>
+        /// Initialize a new instance of <see cref="ActivitiesApi"/>.
+        /// </summary>
+        /// <param name="http">The <see cref="HttpClient"/> used to send HTTP requests to the OpenProject API.</param>
+        /// <param name="auth">Optional authentication provider that will apply authentication headers to requests.</param>
         public ActivitiesApi(HttpClient http, IAuthProvider? auth)
         //public ActivitiesApi(OpenProjectClient client)
         {
@@ -25,9 +34,11 @@ namespace auxua.OpenProject.Client
         }
 
         /// <summary>
-        /// Call one Activity by its ID
+        /// Retrieve a single activity by its identifier.
         /// </summary>
-        /// <param name="id">Activity ID</param>
+        /// <param name="id">The unique identifier of the activity to retrieve.</param>
+        /// <returns>A task that resolves to the <see cref="Activity"/> instance. If the response body cannot be deserialized a new empty <see cref="Activity"/> is returned.</returns>
+        /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<Activity> GetActivityByIdAsync(int id)
         {
             using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/activities/{id}");
@@ -43,11 +54,14 @@ namespace auxua.OpenProject.Client
 
 
         /// <summary>
-        /// Get Activities for a given WorkPackage
+        /// Retrieve activities associated with a specific work package.
         /// </summary>
-        /// <param name="wp">the Workpackage to query</param>
-        /// <param name="pageSize"></param>
-        /// <param name="page"></param>
+        /// <param name="wp">The <see cref="WorkPackage"/> whose activities should be fetched. The work package must contain a HAL link named "activities".</param>
+        /// <param name="pageSize">The number of items to request per page. Defaults to 100.</param>
+        /// <param name="page">The page offset to request. Defaults to 1.</param>
+        /// <returns>A task that resolves to a <see cref="HalCollection{Activity}"/> containing the activities for the work package. If the response body cannot be deserialized a new empty collection is returned.</returns>
+        /// <exception cref="InvalidOperationException">Thrown when the provided work package does not contain an "activities" link.</exception>
+        /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Activity>> GetActivitiesForWorkPackageAsync(WorkPackage wp, int pageSize = 100, int page = 1)
         {
             // Get correct href for activities link
