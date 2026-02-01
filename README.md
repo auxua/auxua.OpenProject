@@ -1,6 +1,6 @@
 ﻿# auxua.OpenProject
 
-[![Version](https://img.shields.io/github/v/tag/auxua/OpenProjectClient?sort=semver)](https://github.com/auxua/OpenProjectClient/tags)
+[![Version](https://img.shields.io/github/v/tag/auxua/auxua.OpenProject?sort=semver)](https://github.com/auxua/auxua.OpenProject/tags)
 [![License](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 ![.NET](https://img.shields.io/badge/.NET-Standard2.0-purple?logo=dotnet)
 [![NuGet](https://img.shields.io/nuget/v/auxua.OpenProject?color=blue&logo=nuget)](https://www.nuget.org/packages/auxua.OpenProject/)]
