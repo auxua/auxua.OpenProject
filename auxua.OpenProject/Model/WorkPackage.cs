@@ -37,6 +37,7 @@ namespace auxua.OpenProject.Model
         public IDictionary<string, JToken>? Extra { get; set; }
 
         public Dictionary<string, CustomFieldTyped> AdditionalFields { get; private set; }
+            = new Dictionary<string, CustomFieldTyped>();
 
         private WorkPackageFacade _wf = null!;
 
@@ -49,10 +50,13 @@ namespace auxua.OpenProject.Model
             AdditionalFields = _wf.CustomFields;
 
             // Get the "standard" fields too
-            foreach (var item in this.Extra)
+            if (this.Extra != null)
             {
-                if (item.Key.StartsWith("customField")) continue;
-                AdditionalFields[item.Key] = new CustomFieldTyped(new CustomFieldValue() { });
+                foreach (var item in this.Extra)
+                {
+                    if (item.Key.StartsWith("customField")) continue;
+                    AdditionalFields[item.Key] = new CustomFieldTyped(new CustomFieldValue() { });
+                }
             }
         }
     }
@@ -65,4 +69,6 @@ namespace auxua.OpenProject.Model
     //    [JsonProperty("html")]
     //    public string? Html { get; set; }
     //}
+
+
 }

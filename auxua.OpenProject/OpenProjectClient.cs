@@ -108,9 +108,9 @@ namespace auxua.OpenProject
                 : new PatAuthProvider(options.PersonalAccessToken);
 
             Projects = new ProjectsApi(_http, _auth);
-            WorkPackages = new WorkPackagesApi(_http, _auth, CustomFields);
             Activities = new ActivitiesApi(_http, _auth);
             Relations = new RelationsApi(_http, _auth);
+            WorkPackages = new WorkPackagesApi(_http, _auth, CustomFields, Relations);
             News = new NewsApi(_http, _auth);
             Users = new UsersApi(_http, _auth);
             TimeEntries =  new TimeEntriesApi(_http, _auth);
