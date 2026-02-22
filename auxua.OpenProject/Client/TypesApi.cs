@@ -24,14 +24,18 @@ namespace auxua.OpenProject.Client
 
         public async Task<HalCollection<WorkPackageType>> GetTypesAsync(int pageSize = 100, int page = 1)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/types?pageSize={pageSize}&offset={page}");
-            _auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            var url = $"api/v3/types?pageSize={pageSize}&offset={page}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/types?pageSize={pageSize}&offset={page}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             var col = JsonConvert.DeserializeObject<HalCollection<WorkPackageType>>(body)
                       ?? new HalCollection<WorkPackageType>();

@@ -98,14 +98,17 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<WorkPackage> GetWorkPackageByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/work_packages/{id}");
-            _auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            var body = await REST.RequestHelper.GetAsStringAsync($"api/v3/work_packages/{id}", _http, _auth);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/work_packages/{id}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<WorkPackage>(body)
                    ?? new WorkPackage();
@@ -223,27 +226,31 @@ namespace auxua.OpenProject.Client
             var json = payload.ToString(Newtonsoft.Json.Formatting.None);
 
             // 1) form validate (optional)
-            using (var formReq = new HttpRequestMessage(HttpMethod.Post, "api/v3/work_packages/form"))
-            {
-                formReq.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                _auth?.Apply(formReq);
 
-                var formResp = await _http.SendAsync(formReq);
-                var formBody = await formResp.Content.ReadAsStringAsync();
-                if (!formResp.IsSuccessStatusCode)
-                    throw new ApiException(formResp.StatusCode, formBody);
-            }
+            var formBody = await REST.RequestHelper.PostStringAsync("api/v3/work_packages/form", json, _http, _auth);
+
+            //using (var formReq = new HttpRequestMessage(HttpMethod.Post, "api/v3/work_packages/form"))
+            //{
+            //    formReq.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            //    _auth?.Apply(formReq);
+
+            //    var formResp = await _http.SendAsync(formReq);
+            //    var formBody = await formResp.Content.ReadAsStringAsync();
+            //    if (!formResp.IsSuccessStatusCode)
+            //        throw new ApiException(formResp.StatusCode, formBody);
+            //}
 
             // 2) create
-            using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/work_packages");
-            req.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.PostStringAsync("api/v3/work_packages", json, _http, _auth);
+            //using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/work_packages");
+            //req.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             var wp = JsonConvert.DeserializeObject<WorkPackage>(body) ?? new WorkPackage();
             wp.AddCustomFields(_customFieldRegistry);
@@ -270,27 +277,19 @@ namespace auxua.OpenProject.Client
             var json = payload.ToString(Newtonsoft.Json.Formatting.None);
 
             // 1) update form validate
-            using (var formReq = new HttpRequestMessage(HttpMethod.Post, $"api/v3/work_packages/{id}/form"))
-            {
-                formReq.Content = new StringContent(json, Encoding.UTF8, "application/json");
-                _auth?.Apply(formReq);
-
-                var formResp = await _http.SendAsync(formReq);
-                var formBody = await formResp.Content.ReadAsStringAsync();
-                if (!formResp.IsSuccessStatusCode)
-                    throw new ApiException(formResp.StatusCode, formBody);
-            }
+            var FormBody = await REST.RequestHelper.PostStringAsync("api/v3/work_packages", json, _http, _auth);
 
             // 2) patch
-            using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/work_packages/{id}");
-            req.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.PatchStringAsync($"api/v3/work_packages/{id}", json, _http, _auth);
+            //using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/work_packages/{id}");
+            //req.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             var wp = JsonConvert.DeserializeObject<WorkPackage>(body) ?? new WorkPackage();
             wp.AddCustomFields(_customFieldRegistry);
@@ -304,17 +303,18 @@ namespace auxua.OpenProject.Client
             return wp;
         }
 
-        public async Task DeleteWorkPackageAsync(int id)
-        {
-            using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/work_packages/{id}");
-            _auth?.Apply(req);
+        public Task DeleteWorkPackageAsync(int id) 
+            => REST.RequestHelper.DeleteNoContentAsync($"api/v3/work_packages/{id}",_http,_auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/work_packages/{id}");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
-        }
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
+        
 
         public async Task<WorkPackage> UpdateWithRelationsAsync(int id, WorkPackageChangeSet cs, int? lockVersion = null)
         {

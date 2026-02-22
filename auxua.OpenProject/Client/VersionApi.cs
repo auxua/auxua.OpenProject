@@ -36,12 +36,15 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Version>> GetVersionsAsync(int pageSize = 50, int offset = 1)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/versions?pageSize={pageSize}&offset={offset}");
-            _auth?.Apply(req);
+            var url = $"api/v3/versions?pageSize={pageSize}&offset={offset}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/versions?pageSize={pageSize}&offset={offset}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Version>>(body) ?? new HalCollection<Version>();
         }
@@ -56,12 +59,15 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Version>> GetVersionsForWorkspaceAsync(int workspaceId, int pageSize = 50, int offset = 1)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/workspaces/{workspaceId}/versions?pageSize={pageSize}&offset={offset}");
-            _auth?.Apply(req);
+            var url = $"api/v3/workspaces/{workspaceId}/versions?pageSize={pageSize}&offset={offset}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/workspaces/{workspaceId}/versions?pageSize={pageSize}&offset={offset}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Version>>(body) ?? new HalCollection<Version>();
         }
@@ -78,12 +84,15 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Version>> GetVersionsForProjectAsync(int projectId, int pageSize = 50, int offset = 1)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/projects/{projectId}/versions?pageSize={pageSize}&offset={offset}");
-            _auth?.Apply(req);
+            var url = $"api/v3/projects/{projectId}/versions?pageSize={pageSize}&offset={offset}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/projects/{projectId}/versions?pageSize={pageSize}&offset={offset}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Version>>(body) ?? new HalCollection<Version>();
         }
@@ -96,12 +105,15 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<Version> GetVersionByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/versions/{id}");
-            _auth?.Apply(req);
+            var url = $"api/v3/versions/{id}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/versions/{id}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Version>(body) ?? new Version();
         }
@@ -116,14 +128,17 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code for the form request.</exception>
         public async Task<string> GetCreateFormAsync(object payload)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/versions/form");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var url = "api/v3/versions/form";
+            var body = await REST.RequestHelper.PostStringAsync(url, JsonConvert.SerializeObject(payload), _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
-            return body; // Form ist HAL+JSON; fürs MVP kannst du es als string lassen
+            //using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/versions/form");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            return body; // HAL+JSON -> We only need the success status code
         }
 
         /// <summary>
@@ -157,13 +172,16 @@ namespace auxua.OpenProject.Client
 
             await GetCreateFormAsync(payload);
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/versions");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var url = "api/v3/versions";
+            var body = await REST.RequestHelper.PostStringAsync(url, JsonConvert.SerializeObject(payload), _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/versions");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Version>(body) ?? new Version();
         }
@@ -189,34 +207,39 @@ namespace auxua.OpenProject.Client
             string? status = null,
             string? sharing = null)
         {
-            // PATCH payload: nur setzen, was wirklich geändert wird
+            // PATCH payload: Only set what is new
+            //TODO: Check for Changeset-Approach?
             var payload = new System.Collections.Generic.Dictionary<string, object>();
 
             if (name != null) payload["name"] = name;
             if (descriptionMarkdown != null) payload["description"] = new { format = "markdown", raw = descriptionMarkdown };
-            if (startDate.HasValue) payload["startDate"] = startDate.Value.ToString("yyyy-MM-dd");
-            if (endDate.HasValue) payload["endDate"] = endDate.Value.ToString("yyyy-MM-dd");
+            if (startDate.HasValue) payload["startDate"] = startDate.Value.ToString(OpenProjectClient.DateFormat);
+            if (endDate.HasValue) payload["endDate"] = endDate.Value.ToString(OpenProjectClient.DateFormat);
             if (status != null) payload["status"] = status;
             if (sharing != null) payload["sharing"] = sharing;
 
             // Update form exists: POST /api/v3/versions/{id}/form  (optional, recommended)
-            using (var formReq = new HttpRequestMessage(HttpMethod.Post, $"api/v3/versions/{id}/form"))
-            {
-                formReq.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                _auth?.Apply(formReq);
+            var url = $"api/v3/versions/{id}/form";
+            var FormBody = await REST.RequestHelper.PostStringAsync(url,JsonConvert.SerializeObject(payload), _http, _auth);
+            //using (var formReq = new HttpRequestMessage(HttpMethod.Post, $"api/v3/versions/{id}/form"))
+            //{
+            //    formReq.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //    _auth?.Apply(formReq);
 
-                var formResp = await _http.SendAsync(formReq);
-                var formBody = await formResp.Content.ReadAsStringAsync();
-                if (!formResp.IsSuccessStatusCode) throw new ApiException(formResp.StatusCode, formBody);
-            }
+            //    var formResp = await _http.SendAsync(formReq);
+            //    var formBody = await formResp.Content.ReadAsStringAsync();
+            //    if (!formResp.IsSuccessStatusCode) throw new ApiException(formResp.StatusCode, formBody);
+            //}
 
-            using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/versions/{id}");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            url = $"api/v3/versions/{id}";
+            var body = await REST.RequestHelper.PatchStringAsync(url, JsonConvert.SerializeObject(payload), _http, _auth);
+            //using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/versions/{id}");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Version>(body) ?? new Version();
         }
@@ -227,15 +250,19 @@ namespace auxua.OpenProject.Client
         /// <param name="id">The identifier of the version to delete.</param>
         /// <returns>A task that completes when the delete operation has finished.</returns>
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
-        public async Task DeleteVersionAsync(int id)
-        {
-            using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/versions/{id}");
-            _auth?.Apply(req);
+        public Task DeleteVersionAsync(int id)
+            => REST.RequestHelper.DeleteNoContentAsync($"api/v3/versions/{id}", _http, _auth);
+        //{
+        //    var url = $"api/v3/versions/{id}";
+            
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
-        }
+        //    using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/versions/{id}");
+        //    _auth?.Apply(req);
+
+        //    var resp = await _http.SendAsync(req);
+        //    var body = await resp.Content.ReadAsStringAsync();
+        //    if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+        //}
     }
 }
 

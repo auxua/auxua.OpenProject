@@ -55,6 +55,7 @@ namespace auxua.OpenProject.Client
             _auth?.Apply(req);
             var resp = await _http.SendAsync(req);
             // In case of redirection, follow the Location header
+            //TODO: Generalize in the Requesthelper
             if ((int)resp.StatusCode is >= 300 and < 400 && resp.Headers.Location != null)
             {
                 var nextUri = resp.Headers.Location.IsAbsoluteUri
@@ -83,12 +84,16 @@ namespace auxua.OpenProject.Client
         public async Task<HalCollection<Relation>> ListRelationsAsync(string? encodedFilters = null, int pageSize = 100, int page = 1)
         {
             var filterPart = string.IsNullOrWhiteSpace(encodedFilters) ? "" : $"&filters={encodedFilters}";
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/relations?pageSize={pageSize}&offset={page}{filterPart}");
-            _auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            var url = $"api/v3/relations?pageSize={pageSize}&offset={page}{filterPart}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
+
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/relations?pageSize={pageSize}&offset={page}{filterPart}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Relation>>(body) ?? new HalCollection<Relation>();
         }
@@ -119,21 +124,23 @@ namespace auxua.OpenProject.Client
 
             var json = JsonConvert.SerializeObject(payload);
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, $"api/v3/work_packages/{fromWorkPackageId}/relations");
-            req.Content = new StringContent(json, Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var url = $"api/v3/work_packages/{fromWorkPackageId}/relations";
+            var body = await REST.RequestHelper.PostStringAsync(url, json, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Post, $"api/v3/work_packages/{fromWorkPackageId}/relations");
+            //req.Content = new StringContent(json, Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Relation>(body) ?? new Relation();
         }
 
-        internal async Task DeleteRelationAsync(int relId)
-        {
-            throw new NotImplementedException();
-        }
+        public Task DeleteRelationAsync(int relId)
+                => REST.RequestHelper.DeleteNoContentAsync($"api/v3/relations/{relId}", _http, _auth);
+
     }
 
 }

@@ -1,6 +1,7 @@
 ﻿using auxua.OpenProject.Authentication;
 using auxua.OpenProject.Model;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -36,14 +37,17 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<HalCollection<Project>> GetProjectsAsync(int pageSize = 10, int offset = 0)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/projects?pageSize=" + pageSize + "&offset=" + offset);
-            _auth?.Apply(req);
+            var url = $"api/v3/projects?pageSize={pageSize}&offset={offset}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/projects?pageSize=" + pageSize + "&offset=" + offset);
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Project>>(body)
                    ?? new HalCollection<Project>();

@@ -39,12 +39,14 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<HalCollection<News>> GetNewsAsync(int pageSize = 100, int offset = 1)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/news?pageSize={pageSize}&offset={offset}");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync($"api/v3/news?pageSize={pageSize}&offset={offset}", _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/news?pageSize={pageSize}&offset={offset}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             var res = JsonConvert.DeserializeObject<HalCollection<News>>(body) ?? new HalCollection<News>();
             foreach (var item in res.Elements)
@@ -67,12 +69,14 @@ namespace auxua.OpenProject.Client
             var url = $"api/v3/news?pageSize={pageSize}&offset={offset}";
             if (query != null) url += $"&filters={query.Build()}";
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             var res = JsonConvert.DeserializeObject<HalCollection<News>>(body) ?? new HalCollection<News>();
             foreach (var item in res.Elements)
@@ -119,12 +123,14 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<News> GetNewsByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/news/{id}");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync($"api/v3/news/{id}", _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/news/{id}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             var res = JsonConvert.DeserializeObject<News>(body) ?? new News();
             res.PostProcess();
@@ -154,13 +160,16 @@ namespace auxua.OpenProject.Client
                 }
             };
 
-            using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/news");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.PostStringAsync($"api/v3/news", JsonConvert.SerializeObject(payload), _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+
+            //using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/news");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<News>(body) ?? new News();
         }
@@ -183,13 +192,16 @@ namespace auxua.OpenProject.Client
             if (descriptionMarkdown != null)
                 payload["description"] = new { format = "markdown", raw = descriptionMarkdown };
 
-            using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/news/{id}");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.PatchStringAsync($"api/v3/news/{id}", JsonConvert.SerializeObject(payload), _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+
+            //using var req = new HttpRequestMessage(new HttpMethod("PATCH"), $"api/v3/news/{id}");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<News>(body) ?? new News();
         }
@@ -200,17 +212,18 @@ namespace auxua.OpenProject.Client
         /// <param name="id">The identifier of the news item to delete.</param>
         /// <returns>A task that completes when the delete operation has finished.</returns>
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
-        public async Task DeleteNewsAsync(int id)
-        {
-            using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/news/{id}");
-            _auth?.Apply(req);
+        public Task DeleteNewsAsync(int id)
+            => REST.RequestHelper.DeleteNoContentAsync($"api/v3/news/{id}", _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
-        }
+            //using var req = new HttpRequestMessage(HttpMethod.Delete, $"api/v3/news/{id}");
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
         // ----------------------------
         // Query builder (optional)

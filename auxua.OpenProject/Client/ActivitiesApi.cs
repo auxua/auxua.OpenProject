@@ -41,12 +41,13 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code. The exception contains the HTTP status code and response body.</exception>
         public async Task<Activity> GetActivityByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/activities/{id}");
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync($"api/v3/activities/{id}", _http, _auth);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/activities/{id}");
+            //_auth?.Apply(req);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Activity>(body) ?? new Activity();
         }
@@ -75,14 +76,16 @@ namespace auxua.OpenProject.Client
             // pagination params 
             var url =  $"{href}?pageSize={pageSize}&offset={page}";
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url.TrimStart('/'));
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync(url.TrimStart('/'), _http, _auth);
+
+            //using var req = new HttpRequestMessage(HttpMethod.Get, url.TrimStart('/'));
+            //_auth?.Apply(req);
 
             
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
-            if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+            //if (!resp.IsSuccessStatusCode) throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<Activity>>(body) ?? new HalCollection<Activity>();
         }

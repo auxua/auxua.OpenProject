@@ -41,14 +41,16 @@ namespace auxua.OpenProject.Client
             var url = $"api/v3/time_entries?pageSize={pageSize}&offset={page}";
             if (query != null) url += $"&filters={query.Build()}";
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<TimeEntry>>(body) ?? new HalCollection<TimeEntry>();
         }
@@ -61,14 +63,17 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<TimeEntry> GetTimeEntryByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/time_entries/{id}");
-            _auth?.Apply(req);
+            var url = $"api/v3/time_entries/{id}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/time_entries/{id}");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<TimeEntry>(body) ?? new TimeEntry();
         }
@@ -108,27 +113,34 @@ namespace auxua.OpenProject.Client
 
             // optional: form call (validiert/writable/allowed)
             // POST /api/v3/time_entries/form
-            using (var formReq = new HttpRequestMessage(HttpMethod.Post, "api/v3/time_entries/form"))
-            {
-                formReq.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-                _auth?.Apply(formReq);
 
-                var formResp = await _http.SendAsync(formReq);
-                var formBody = await formResp.Content.ReadAsStringAsync();
-                if (!formResp.IsSuccessStatusCode)
-                    throw new ApiException(formResp.StatusCode, formBody);
-            }
+            var url = "api/v3/time_entries/form";
+            var formBody = await REST.RequestHelper.PostStringAsync(url, JsonConvert.SerializeObject(payload), _http, _auth);
+
+            //using (var formReq = new HttpRequestMessage(HttpMethod.Post, "api/v3/time_entries/form"))
+            //{
+            //    formReq.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //    _auth?.Apply(formReq);
+
+            //    var formResp = await _http.SendAsync(formReq);
+            //    var formBody = await formResp.Content.ReadAsStringAsync();
+            //    if (!formResp.IsSuccessStatusCode)
+            //        throw new ApiException(formResp.StatusCode, formBody);
+            //}
 
             // aactual create
-            using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/time_entries");
-            req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
-            _auth?.Apply(req);
+            url = "api/v3/time_entries";
+            var body = await REST.RequestHelper.PostStringAsync(url, JsonConvert.SerializeObject(payload), _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Post, "api/v3/time_entries");
+            //req.Content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<TimeEntry>(body) ?? new TimeEntry();
         }

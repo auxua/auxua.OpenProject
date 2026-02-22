@@ -44,14 +44,16 @@ namespace auxua.OpenProject.Client
             if (query != null)
                 url += $"&filters={query.Build()}";
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<HalCollection<User>>(body)
                    ?? new HalCollection<User>();
@@ -65,14 +67,17 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code.</exception>
         public async Task<User> GetUserByIdAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/users/{id}");
-            _auth?.Apply(req);
+            var url = $"api/v3/users/{id}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/users/{id}");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<User>(body) ?? new User();
         }
@@ -84,21 +89,25 @@ namespace auxua.OpenProject.Client
         /// <exception cref="ApiException">Thrown when the API returns a non-success status code or the endpoint is not supported.</exception>
         public async Task<User> GetMeAsync()
         {
-            // 1) Try the common endpoint
-            using (var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/users/me"))
-            {
-                _auth?.Apply(req);
+            var url = "api/v3/users/me";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
+            return JsonConvert.DeserializeObject<User>(body) ?? new User();
 
-                var resp = await _http.SendAsync(req);
-                var body = await resp.Content.ReadAsStringAsync();
+            //// 1) Try the common endpoint
+            //using (var req = new HttpRequestMessage(HttpMethod.Get, "api/v3/users/me"))
+            //{
+            //    _auth?.Apply(req);
 
-                if (resp.IsSuccessStatusCode)
-                    return JsonConvert.DeserializeObject<User>(body) ?? new User();
+            //    var resp = await _http.SendAsync(req);
+            //    var body = await resp.Content.ReadAsStringAsync();
 
-                // If endpoint not supported / forbidden, surface a clear error
-                // (Fallback can be added later via /api/v3/my_preferences which is documented.)
-                throw new ApiException(resp.StatusCode, body);
-            }
+            //    if (resp.IsSuccessStatusCode)
+            //        return JsonConvert.DeserializeObject<User>(body) ?? new User();
+
+            //    // If endpoint not supported / forbidden, surface a clear error
+            //    // (Fallback can be added later via /api/v3/my_preferences which is documented.)
+            //    throw new ApiException(resp.StatusCode, body);
+            //}
         }
 
         /// <summary>

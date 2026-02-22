@@ -48,14 +48,17 @@ namespace auxua.OpenProject.Client
                 sortByJson,
                 groupBy);
 
-            using var req = new HttpRequestMessage(HttpMethod.Get, url);
-            _auth?.Apply(req);
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //using var req = new HttpRequestMessage(HttpMethod.Get, url);
+            //_auth?.Apply(req);
+
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             var res = JsonConvert.DeserializeObject<NotificationCollection>(body)
                    ?? new NotificationCollection();
@@ -99,14 +102,17 @@ namespace auxua.OpenProject.Client
         /// </summary>
         public async Task<Notification> GetNotificationAsync(int id)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/notifications/{id}");
-            _auth?.Apply(req);
+            var url = $"api/v3/notifications/{id}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/notifications/{id}");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<Notification>(body)
                    ?? new Notification();
@@ -143,14 +149,17 @@ namespace auxua.OpenProject.Client
         /// </summary>
         public async Task<NotificationDetail> GetNotificationDetailAsync(int notificationId, int detailId)
         {
-            using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/notifications/{notificationId}/details/{detailId}");
-            _auth?.Apply(req);
+            var url = $"api/v3/notifications/{notificationId}/details/{detailId}";
+            var body = await REST.RequestHelper.GetAsStringAsync(url, _http, _auth);
 
-            var resp = await _http.SendAsync(req);
-            var body = await resp.Content.ReadAsStringAsync();
+            //using var req = new HttpRequestMessage(HttpMethod.Get, $"api/v3/notifications/{notificationId}/details/{detailId}");
+            //_auth?.Apply(req);
 
-            if (!resp.IsSuccessStatusCode)
-                throw new ApiException(resp.StatusCode, body);
+            //var resp = await _http.SendAsync(req);
+            //var body = await resp.Content.ReadAsStringAsync();
+
+            //if (!resp.IsSuccessStatusCode)
+            //    throw new ApiException(resp.StatusCode, body);
 
             return JsonConvert.DeserializeObject<NotificationDetail>(body)
                    ?? new NotificationDetail();
