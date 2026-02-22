@@ -95,13 +95,13 @@ namespace OpenProjectClient
             {
                 ProjectId = id,
                 Subject = "Test WP new",
-                StatusId = 2,
+                StatusId = 3,
                 //StartDate = DateTime.Now.ToString(auxua.OpenProject.OpenProjectClient.DateFormat),
             };
             //nwp.AddRelations.Add(new RelationCreateSpec(1565, RelationType.Follows, 1, "test relation"));
 
             //var nwp_call = await client.WorkPackages.CreateWorkPackageAsync(nwp);
-            var nwp_call = await client.WorkPackages.UpdateWorkPackageAsync(1585,nwp);
+            //var nwp_call = await client.WorkPackages.UpdateWorkPackageAsync(1585,nwp);
 
             Console.WriteLine("fin.");
             Console.ReadLine();

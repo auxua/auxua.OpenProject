@@ -57,20 +57,19 @@ var ftest = new WorkPackageFacade(testwp, client.CustomFields);
 
 |               	| Read / Get 	| Write (Create/Update/Delete) 	|
 |---------------	|------------	|------------------------------	|
-| Activities    	| ✅          	| ⭕                            	|
+| Activities    	| ✅          	| -                            	|
 | Attachments    	| ⭕          	| ⭕                            	|
-| News          	| ✅          	| ⚠️ All testing                	|
+| News          	| ✅          	| ✅                 	|
 | Notifications    	| ✅          	| ✅ (Mark [Un]Read)          	|
 | Projects      	| ✅          	| ⭕                            	|
-| Relations     	| ✅          	| ⚠️ Create testing             	|
-| Time Tracking 	| ✅          	| ⚠️ Creation Testing            	|
+| Relations     	| ✅          	| ✅              	|
+| Time Tracking 	| ✅          	| ✅ (Create)            	|
 | Users         	| ✅          	| -                            	|
-| Version       	| ✅          	| ⚠️ Testing                    	|
-| Wiki Pages    	| ⭕          	| ⭕                            	|
-| WorkPackages  	| ✅          	| ⭕                            	|
+| Version       	| ✅          	| ✅                     	|
+| WorkPackages  	| ✅          	| ✅                            	|
 | WorkPackage Types  	| ✅          	| -                            	|
-| WorkPackage Custom Fields    	| ✅          	| ⭕                            	|
-| Work Package Custom Options    	| ⚠️          	| ⭕                            	|
+| WorkPackage Custom Fields    	| ✅          	| -                            	|
+| Work Package Custom Options    	| ⚠️ (incomplete)         	| -                            	|
 
 ## Issues and Contributions
 
