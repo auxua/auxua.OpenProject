@@ -1,6 +1,7 @@
 ﻿using auxua.OpenProject.Model;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,31 +24,38 @@ namespace auxua.OpenProject.Client
             if (startPage <= 0) throw new ArgumentOutOfRangeException(nameof(startPage));
 
             var all = new List<T>();
-
             var page = startPage;
-            HalCollection<T>? resp = null;
 
             while (true)
             {
                 ct.ThrowIfCancellationRequested();
 
-                resp = await fetchPageAsync(page, pageSize).ConfigureAwait(false);
+                var resp = await fetchPageAsync(page, pageSize).ConfigureAwait(false);
 
-                // Add elements
-                var elements = resp.Elements; // assuming your HalCollection<T> exposes typed Elements
-                if (elements.Count > 0)
-                    all.AddRange(elements);
+                var elements = resp.Elements ?? new List<T>();
+                var returned = elements.Count;
 
-                // Stop conditions:
-                // 1) We reached total (if total is provided reliably)
+                // NEW: empty page => stop (prevents endless loops)
+                if (returned == 0)
+                {
+                    
+                    
+                    break;
+                }
+
+                all.AddRange(elements);
+
+                // Stop if total is reliable
                 if (resp.Total > 0 && all.Count >= resp.Total)
                     break;
 
-                // 2) Fewer than pageSize returned => likely last page
-                if (resp.Count > 0 && resp.Count < pageSize)
+                // NEW: use effective page size (server may cap pageSize)
+                var effectivePageSize = resp.PageSize > 0 ? resp.PageSize : pageSize;
+
+                // Last page if fewer returned than page size
+                if (returned < effectivePageSize)
                     break;
 
-                // 3) Safety guard
                 if (maxPages.HasValue && (page - startPage + 1) >= maxPages.Value)
                     break;
 

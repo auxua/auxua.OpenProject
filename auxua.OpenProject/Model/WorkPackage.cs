@@ -60,7 +60,6 @@ namespace auxua.OpenProject.Model
             }
         }
     }
-
     //public sealed class WorkPackageDescription
     //{
     //    [JsonProperty("raw")]

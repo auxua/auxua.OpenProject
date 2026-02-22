@@ -72,14 +72,14 @@ namespace auxua.OpenProject.WriteModel
             // CustomField link values (list/reference custom fields)
             foreach (var kv in cs.CustomFieldLinkHrefs)
             {
-                // rel name: customField{ID} oder customFields{ID} – du kennst es aus Schema/Registry
+                // rel name: customField{ID} or customFields{ID} 
                 var rel = $"customField{kv.Key}";
 
                 var arr = new JArray();
                 foreach (var href in kv.Value)
                     arr.Add(new JObject { ["href"] = href });
 
-                // Im HAL-Body müssen arrays als array kommen
+                // HAL-Body arrays
                 links[rel] = arr;
             }
 
@@ -90,7 +90,7 @@ namespace auxua.OpenProject.WriteModel
 
 }
 
-public class RelationCreateSpec
+    public class RelationCreateSpec
     {
         public int ToWorkPackageId { get; set; }
         public string Type { get; set; } // duplicates, relates, follows, ...

@@ -1,5 +1,7 @@
 ﻿using auxua.OpenProject.Authentication;
 using auxua.OpenProject.Model;
+using auxua.OpenProject.WriteModel;
+
 using static auxua.OpenProject.Client.WorkPackagesApi;
 
 namespace OpenProjectClient
@@ -19,6 +21,11 @@ namespace OpenProjectClient
             var testproject = "[API-Testing] Zeitplan";
 
             var client = new auxua.OpenProject.OpenProjectClient(config);
+
+            var ss = await client.Status.GetAllStatusesAsync();
+
+            Console.WriteLine("exec");
+
 
             //HalCollection<Project> projects = await client.Projects.GetProjectsAsync();
 
@@ -69,6 +76,32 @@ namespace OpenProjectClient
             //Console.WriteLine(ftest.CustomFields.Dump());
 
             //Console.WriteLine(koop.Dump());
+
+            var me = await client.Users.GetMeAsync();
+
+
+            var tt = await client.Types.GetAllTypesAsync();
+            //var noti1 = await client.Notifications.GetNotificationsAsync();
+            //var noti2 = await client.Notifications.GetNotificationsAsync(getDetails:true);
+            //var noti = await client.Notifications.GetAllNotificationsAsync();
+
+            //var fnot = noti.First();
+            //Console.WriteLine(fnot.ToString());
+            //var dnot = await client.Notifications.GetNotificationAsync(fnot.Id);
+            //Console.WriteLine(dnot.ToString());
+            //await client.Notifications.MarkAsUnreadAsync(fnot.Id);
+
+            var nwp = new WorkPackageChangeSet()
+            {
+                ProjectId = id,
+                Subject = "Test WP new",
+                StatusId = 2,
+                //StartDate = DateTime.Now.ToString(auxua.OpenProject.OpenProjectClient.DateFormat),
+            };
+            //nwp.AddRelations.Add(new RelationCreateSpec(1565, RelationType.Follows, 1, "test relation"));
+
+            //var nwp_call = await client.WorkPackages.CreateWorkPackageAsync(nwp);
+            var nwp_call = await client.WorkPackages.UpdateWorkPackageAsync(1585,nwp);
 
             Console.WriteLine("fin.");
             Console.ReadLine();

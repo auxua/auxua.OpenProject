@@ -5,7 +5,7 @@ using System.Text;
 
 namespace auxua.OpenProject.Model
 {
-    public sealed class HalCollection<T> : HalResource
+    public class HalCollection<T> : HalResource
     {
         [JsonProperty("total")]
         public int Total { get; set; }

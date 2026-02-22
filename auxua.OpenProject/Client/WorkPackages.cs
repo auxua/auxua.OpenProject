@@ -205,6 +205,18 @@ namespace auxua.OpenProject.Client
         }
 
 
+        /// <summary>
+        /// Creates a new work package in the OpenProject backend based on the provided <see cref="WorkPackageChangeSet"/>.
+        /// </summary>
+        /// <param name="cs">The change set that contains all properties to set, custom field values, link hrefs and relations.</param>
+        /// <returns>
+        /// The created <see cref="WorkPackage"/>, based on OP response
+        /// </returns>
+        /// <remarks>
+        /// Relations: All relations specified in <paramref name="cs"/> are created sequentially via <see cref="RelationsApi.CreateRelationAsync"/>.
+        ///            Errors while creating relations are propagated to the caller.
+        ///
+        /// </remarks>
         public async Task<WorkPackage> CreateWorkPackageAsync(WorkPackageChangeSet cs)
         {
             var payload = WorkPackageChangeSet.BuildWorkPackagePayload(cs);
@@ -235,6 +247,11 @@ namespace auxua.OpenProject.Client
 
             var wp = JsonConvert.DeserializeObject<WorkPackage>(body) ?? new WorkPackage();
             wp.AddCustomFields(_customFieldRegistry);
+
+            // 3) add relations
+            foreach (var r in cs.AddRelations)
+                await _rels.CreateRelationAsync(wp.Id, r.ToWorkPackageId, r.Type, r.Description, r.Lag);
+
             return wp;
         }
 
@@ -245,7 +262,11 @@ namespace auxua.OpenProject.Client
             // lockversion
             if (lockVersion.HasValue)
                 payload["lockVersion"] = lockVersion.Value;
-
+            else
+            {
+                var old = await GetWorkPackageByIdAsync(id);
+                payload["lockVersion"] = old.LockVersion;
+            }
             var json = payload.ToString(Newtonsoft.Json.Formatting.None);
 
             // 1) update form validate
@@ -273,6 +294,13 @@ namespace auxua.OpenProject.Client
 
             var wp = JsonConvert.DeserializeObject<WorkPackage>(body) ?? new WorkPackage();
             wp.AddCustomFields(_customFieldRegistry);
+
+            // 3) update relations: delete old and add new (could be optimized by diffing, but good enough for now)
+            foreach (var relId in cs.DeleteRelationIds)
+                await _rels.DeleteRelationAsync(relId);
+            foreach (var r in cs.AddRelations)
+                await _rels.CreateRelationAsync(wp.Id, r.ToWorkPackageId, r.Type, r.Description, r.Lag);
+
             return wp;
         }
 
@@ -301,6 +329,38 @@ namespace auxua.OpenProject.Client
                 await _rels.DeleteRelationAsync(relId);
 
             return wp;
+        }
+    }
+
+    public class WorkPackageTypeRegistry
+    {
+        private readonly object _gate = new();
+        private readonly Dictionary<int, WorkPackageType> _byId = new();
+        private readonly Dictionary<string, int> _byName = new(StringComparer.OrdinalIgnoreCase);
+
+        public void UpsertMany(IEnumerable<WorkPackageType> types)
+        {
+            foreach (var t in types) Upsert(t);
+        }
+
+        public void Upsert(WorkPackageType t)
+        {
+            lock (_gate)
+            {
+                _byId[t.Id] = t;
+                if (!string.IsNullOrWhiteSpace(t.Name))
+                    _byName[t.Name!] = t.Id;
+            }
+        }
+
+        public bool TryGetIdByName(string name, out int id)
+        {
+            lock (_gate) return _byName.TryGetValue(name, out id);
+        }
+
+        public bool TryGetById(int id, out WorkPackageType t)
+        {
+            lock (_gate) return _byId.TryGetValue(id, out t!);
         }
     }
 

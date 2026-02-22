@@ -25,6 +25,9 @@ namespace auxua.OpenProject
                                                     .Version?
                                                     .ToString();
 
+        public static readonly string DateFormat = "yyyy-MM-dd";
+        public static readonly string DateTimeFormat = "yyyy-MM-ddThh:mm:ss.fffZ";
+
         /// <summary>
         /// The underlying <see cref="HttpClient"/> used to perform HTTP requests
         /// against the OpenProject server.
@@ -73,9 +76,27 @@ namespace auxua.OpenProject
         public UsersApi Users { get; }
 
         /// <summary>
-        /// API interface for time entry operations.
+        /// API interface for time entry operations
         /// </summary>
         public TimeEntriesApi TimeEntries { get; }
+
+        /// <summary>
+        /// API interface for type-related operations, such as fetching work package types
+        /// </summary>
+        public TypesApi Types { get; }
+
+        /// <summary>
+        /// API interface for notification-related operations, such as fetching notifications for the current user
+        /// </summary>
+        public NotificationsApi Notifications { get; }
+
+        /// <summary>
+        /// API interface for the statuses in the instance
+        /// </summary>
+        public StatusApi Status { get; }
+
+        public WorkPackageTypeRegistry WorkPackageTypes { get; } = new WorkPackageTypeRegistry();
+        public StatusRegistry Statuses { get; } = new StatusRegistry();
 
         /// <summary>
         /// Creates a new instance of <see cref="OpenProjectClient"/>.
@@ -114,6 +135,9 @@ namespace auxua.OpenProject
             News = new NewsApi(_http, _auth);
             Users = new UsersApi(_http, _auth);
             TimeEntries =  new TimeEntriesApi(_http, _auth);
+            Types = new TypesApi(_http, _auth, WorkPackageTypes);
+            Notifications = new NotificationsApi(_http, _auth);
+            Status = new StatusApi(_http, _auth, Statuses);
         }
     }
 }

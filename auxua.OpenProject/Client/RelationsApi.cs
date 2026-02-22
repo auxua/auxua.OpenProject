@@ -129,6 +129,11 @@ namespace auxua.OpenProject.Client
 
             return JsonConvert.DeserializeObject<Relation>(body) ?? new Relation();
         }
+
+        internal async Task DeleteRelationAsync(int relId)
+        {
+            throw new NotImplementedException();
+        }
     }
 
 }
