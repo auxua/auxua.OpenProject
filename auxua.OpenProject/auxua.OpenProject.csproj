@@ -9,10 +9,13 @@
 	  <Authors>Arno Schmetz</Authors>
 	  <PackageProjectUrl>https://github.com/auxua/OpenProjectClient</PackageProjectUrl>
 	  <PackageReadmeFile>README.md</PackageReadmeFile>
-	  <Version>3.0.0</Version>
+	  <Version>3.1.0</Version>
 	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-	  <PackageTags>OpenProject; Open Project; Project Management; API</PackageTags>
+	  <PackageTags>OpenProject; "Open Project"; "Project Management"; API</PackageTags>
 	  <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+	  <Description>An open client for the OpenProject API</Description>
+	  <RepositoryUrl>https://github.com/auxua/auxua.OpenProject</RepositoryUrl>
+	  <PackageReleaseNotes>* Adding Create, Update, Delete Operations and more Endpoints</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
